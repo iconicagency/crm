@@ -40,16 +40,36 @@ export default function TasksPage() {
     } finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchTasks(); }, []);
+  useEffect(() => {
+    let mounted = true;
+    const init = async () => {
+      try {
+        const qs = await getDocs(collection(db, "tasks"));
+        const data = qs.docs.map(d => ({ id: d.id, ...d.data() } as Task)).sort((a,b) => b.createdAt - a.createdAt);
+        if (mounted) {
+          setTasks(data);
+          setLoading(false);
+        }
+      } catch (e) {
+        if (mounted) {
+          toast.error("Không tải được dữ liệu nhắc việc.");
+          setLoading(false);
+        }
+      }
+    };
+    init();
+    return () => { mounted = false; };
+  }, []);
 
   const handleSave = async () => {
     if (!formData.title || !formData.customerName) return toast.error("Vui lòng điền đủ thông tin");
     try {
+      const nowTs = new Date().getTime();
       if (editingId) {
-        await updateDoc(doc(db, "tasks", editingId), { ...formData, updatedAt: Date.now() });
+        await updateDoc(doc(db, "tasks", editingId), { ...formData, updatedAt: nowTs });
         toast.success("Cập nhật lịch chăm sóc thành công!");
       } else {
-        await addDoc(collection(db, "tasks"), { ...formData, createdAt: Date.now(), updatedAt: Date.now() });
+        await addDoc(collection(db, "tasks"), { ...formData, createdAt: nowTs, updatedAt: nowTs });
         toast.success("Tạo lịch chăm sóc thành công!");
       }
       setOpen(false); setFormData({ title: "", customerName: "", type: "Gọi điện", dueDate: "", status: "pending" }); fetchTasks();
@@ -71,8 +91,8 @@ export default function TasksPage() {
   const toggleStatus = async (task: Task) => {
     try {
       const newStatus = task.status === 'pending' ? 'completed' : 'pending';
-      const now = Date.now();
-      await updateDoc(doc(db, "tasks", task.id), { status: newStatus, updatedAt: now });
+      const nowTs = new Date().getTime();
+      await updateDoc(doc(db, "tasks", task.id), { status: newStatus, updatedAt: nowTs });
       fetchTasks();
     } catch(e) {}
   };
@@ -147,7 +167,7 @@ export default function TasksPage() {
                   currentItems.map(t => (
                     <tr key={t.id} className={cn("hover:bg-slate-50", t.status === 'completed' && "opacity-60")}>
                       <td className="px-6 py-4">
-                        <input type="checkbox" checked={t.status === 'completed'} onChange={() => toggleStatus(t)} className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-600 cursor-pointer" />
+                        <input type="checkbox" checked={t.status === 'completed'} onChange={() => toggleStatus(t)} className="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-600 cursor-pointer" />
                       </td>
                       <td className={cn("px-6 py-4 font-medium", t.status === 'completed' && "line-through text-slate-500")}>{t.title}</td>
                       <td className="px-6 py-4 text-slate-700">{t.customerName}</td>
@@ -156,7 +176,7 @@ export default function TasksPage() {
                       </td>
                       <td className="px-6 py-4 text-slate-600">{t.dueDate}</td>
                       <td className="px-6 py-4 text-right">
-                        <button onClick={() => openEditModal(t)} className="text-blue-500 hover:text-blue-700 font-medium text-sm p-1 mr-2">Sửa</button>
+                        <button onClick={() => openEditModal(t)} className="text-emerald-500 hover:text-emerald-700 font-medium text-sm p-1 mr-2">Sửa</button>
                         <button onClick={() => handleDelete(t.id)} className="text-red-500 hover:text-red-700 font-medium text-sm">Xóa</button>
                       </td>
                     </tr>

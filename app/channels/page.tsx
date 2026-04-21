@@ -42,7 +42,26 @@ export default function ChannelsPage() {
     }
   };
 
-  useEffect(() => { fetchChannels(); }, []);
+  useEffect(() => {
+    let mounted = true;
+    const init = async () => {
+      try {
+        const qs = await getDocs(collection(db, "channels"));
+        const data = qs.docs.map(d => ({ id: d.id, ...d.data() } as Channel)).sort((a,b) => b.createdAt - a.createdAt);
+        if (mounted) {
+          setChannels(data);
+          setLoading(false);
+        }
+      } catch (e) {
+        if (mounted) {
+          toast.error("Không tải được dữ liệu Marketing.");
+          setLoading(false);
+        }
+      }
+    };
+    init();
+    return () => { mounted = false; };
+  }, []);
 
   const handleSave = async () => {
     if (!formData.name) return toast.error("Vui lòng điền tên chiến dịch");
@@ -157,7 +176,7 @@ export default function ChannelsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button onClick={() => openEditModal(c)} className="text-blue-500 hover:text-blue-700 font-medium text-sm p-1 mr-2">Sửa</button>
+                        <button onClick={() => openEditModal(c)} className="text-emerald-500 hover:text-emerald-700 font-medium text-sm p-1 mr-2">Sửa</button>
                         <button onClick={() => handleDelete(c.id)} className="text-red-500 hover:text-red-700 font-medium text-sm">Xóa</button>
                       </td>
                     </tr>

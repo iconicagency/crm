@@ -53,7 +53,24 @@ export default function LeadsPage() {
   };
 
   useEffect(() => {
-    fetchLeads();
+    let mounted = true;
+    const init = async () => {
+      try {
+        const snap = await getDocs(collection(db, "leads"));
+        const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lead));
+        if (mounted) {
+          setLeads(data);
+          setLoading(false);
+        }
+      } catch (error) {
+        if (mounted) {
+          toast.error("Lỗi khi tải danh sách Lead");
+          setLoading(false);
+        }
+      }
+    };
+    init();
+    return () => { mounted = false; };
   }, []);
 
   const handleSave = async () => {
@@ -127,7 +144,7 @@ export default function LeadsPage() {
   }
 
   const columns = [
-    { title: "Lead Mới", id: "new", color: "border-blue-500", bg: "bg-blue-50" },
+    { title: "Lead Mới", id: "new", color: "border-emerald-500", bg: "bg-emerald-50" },
     { title: "Đã Liên Hệ", id: "contacted", color: "border-amber-500", bg: "bg-amber-50" },
     { title: "Tiềm Năng", id: "qualified", color: "border-emerald-500", bg: "bg-emerald-50" },
     { title: "Hủy / Thất bại", id: "lost", color: "border-red-500", bg: "bg-red-50" }
@@ -229,7 +246,7 @@ export default function LeadsPage() {
                       <td className="px-6 py-4 text-slate-600">{lead.completionTime}</td>
                       <td className="px-6 py-4">
                         <Select value={lead.status} onValueChange={(v) => updateLeadStatus(lead.id, v || "")}>
-                          <SelectTrigger className={cn("h-7 text-xs border-0", lead.status === 'new' ? "bg-blue-100 text-blue-700" : lead.status === 'contacted' ? "bg-amber-100 text-amber-700" : lead.status === 'qualified' ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700")}>
+                          <SelectTrigger className={cn("h-7 text-xs border-0", lead.status === 'new' ? "bg-emerald-100 text-emerald-700" : lead.status === 'contacted' ? "bg-amber-100 text-amber-700" : lead.status === 'qualified' ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700")}>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -241,7 +258,7 @@ export default function LeadsPage() {
                         </Select>
                       </td>
                       <td className="px-6 py-4 text-right min-w-[120px]">
-                        <button onClick={() => openEditModal(lead)} className="text-blue-500 hover:text-blue-700 font-medium text-sm p-1 mr-2">Sửa</button>
+                        <button onClick={() => openEditModal(lead)} className="text-emerald-500 hover:text-emerald-700 font-medium text-sm p-1 mr-2">Sửa</button>
                         <button onClick={() => handleDelete(lead.id)} className="text-red-500 hover:text-red-700 font-medium text-sm p-1">Xóa</button>
                       </td>
                     </tr>

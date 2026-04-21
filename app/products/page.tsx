@@ -39,7 +39,26 @@ export default function ProductsPage() {
     } finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => {
+    let mounted = true;
+    const init = async () => {
+      try {
+        const qs = await getDocs(collection(db, "products"));
+        const data = qs.docs.map(d => ({ id: d.id, ...d.data() } as Product)).sort((a,b) => b.createdAt - a.createdAt);
+        if (mounted) {
+          setProducts(data);
+          setLoading(false);
+        }
+      } catch (e) {
+        if (mounted) {
+          toast.error("Không tải được dữ liệu sản phẩm.");
+          setLoading(false);
+        }
+      }
+    };
+    init();
+    return () => { mounted = false; };
+  }, []);
 
   const handleSave = async () => {
     if (!formData.name || !formData.sku) return toast.error("Vui lòng điền tên và mã SP");
@@ -135,10 +154,10 @@ export default function ProductsPage() {
                       <td className="px-6 py-4 font-mono text-slate-400 text-xs">{p.sku}</td>
                       <td className="px-6 py-4 font-medium text-slate-800">{p.name}</td>
                       <td className="px-6 py-4 text-slate-600">{p.category}</td>
-                      <td className="px-6 py-4 font-semibold text-blue-600">{new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(p.price)}</td>
+                      <td className="px-6 py-4 font-semibold text-emerald-600">{new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(p.price)}</td>
                       <td className="px-6 py-4 text-slate-500">{p.unit}</td>
                       <td className="px-6 py-4 text-right">
-                        <button onClick={() => openEditModal(p)} className="text-blue-500 hover:text-blue-700 font-medium text-sm p-1 mr-2">Sửa</button>
+                        <button onClick={() => openEditModal(p)} className="text-emerald-500 hover:text-emerald-700 font-medium text-sm p-1 mr-2">Sửa</button>
                         <button onClick={() => handleDelete(p.id)} className="text-red-500 hover:text-red-700 font-medium text-sm">Xóa</button>
                       </td>
                     </tr>

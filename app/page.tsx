@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { cn } from "@/lib/utils";
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({
@@ -201,7 +201,7 @@ export default function DashboardPage() {
         <h1 className="text-xl font-semibold text-slate-800">Tổng quan hệ thống</h1>
         <div className="flex items-center gap-4">
           <div className="relative hidden md:block">
-            <input type="text" placeholder="Tìm kiếm..." className="pl-10 pr-4 py-2 bg-slate-100 border-none rounded-full text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+            <input type="text" placeholder="Tìm kiếm..." className="pl-10 pr-4 py-2 bg-slate-100 border-none rounded-full text-sm w-64 focus:outline-none focus:ring-2 focus:ring-emerald-500/20" />
             <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
           </div>
           <div className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 relative cursor-pointer hover:bg-slate-200 transition-colors">
@@ -291,7 +291,7 @@ export default function DashboardPage() {
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
                   <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
                   <Tooltip cursor={{fill: '#f1f5f9'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
-                  <Bar dataKey="sales" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                  <Bar dataKey="sales" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={32} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -314,7 +314,7 @@ export default function DashboardPage() {
                       </div>
                       <span className={cn(
                           "px-2 py-1 rounded-full text-[10px] font-medium whitespace-nowrap",
-                          lead.status === 'new' ? 'bg-blue-100 text-blue-700' :
+                          lead.status === 'new' ? 'bg-emerald-100 text-emerald-700' :
                           lead.status === 'contacted' ? 'bg-amber-100 text-amber-700' :
                           lead.status === 'qualified' ? 'bg-emerald-100 text-emerald-700' :
                           'bg-red-100 text-red-700'

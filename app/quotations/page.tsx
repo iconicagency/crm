@@ -55,7 +55,24 @@ export default function QuotationsPage() {
   };
 
   useEffect(() => {
-    fetchQuotations();
+    let mounted = true;
+    const init = async () => {
+      try {
+        const snap = await getDocs(collection(db, "quotations"));
+        const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Quotation));
+        if (mounted) {
+          setQuotations(data);
+          setLoading(false);
+        }
+      } catch (error) {
+        if (mounted) {
+          toast.error("Lỗi khi tải danh sách Báo giá");
+          setLoading(false);
+        }
+      }
+    };
+    init();
+    return () => { mounted = false; };
   }, []);
 
   const addProductRow = () => setProducts([...products, { name: "", price: 0, quantity: 1 }]);
@@ -239,7 +256,7 @@ export default function QuotationsPage() {
                       </td>
                       <td className="px-6 py-4 text-right min-w-[180px]">
                         <Button variant="outline" size="sm" onClick={() => handleExportPDF(q)} className="text-xs mr-2">Xuất PDF</Button>
-                        <button onClick={() => openEditModal(q)} className="text-blue-500 hover:text-blue-700 font-medium text-sm p-1 mr-2">Sửa</button>
+                        <button onClick={() => openEditModal(q)} className="text-emerald-500 hover:text-emerald-700 font-medium text-sm p-1 mr-2">Sửa</button>
                         <button onClick={() => handleDelete(q.id)} className="text-red-500 hover:text-red-700 font-medium text-sm p-1">Xóa</button>
                       </td>
                     </tr>

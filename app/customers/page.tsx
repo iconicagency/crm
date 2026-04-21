@@ -47,7 +47,24 @@ export default function CustomersPage() {
   };
 
   useEffect(() => {
-    fetchCustomers();
+    let mounted = true;
+    const init = async () => {
+      try {
+        const snap = await getDocs(collection(db, "customers"));
+        const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Customer));
+        if (mounted) {
+          setCustomers(data);
+          setLoading(false);
+        }
+      } catch (error) {
+        if (mounted) {
+          toast.error("Lỗi khi tải danh sách Khách hàng");
+          setLoading(false);
+        }
+      }
+    };
+    init();
+    return () => { mounted = false; };
   }, []);
 
   const handleSave = async () => {
@@ -182,7 +199,7 @@ export default function CustomersPage() {
                       </td>
                       <td className="px-6 py-4 text-slate-600">{new Date(c.createdAt).toLocaleDateString('vi-VN')}</td>
                       <td className="px-6 py-4 text-right">
-                        <button onClick={() => openEditModal(c)} className="text-blue-500 hover:text-blue-700 font-medium text-sm p-1 mr-2">Sửa</button>
+                        <button onClick={() => openEditModal(c)} className="text-emerald-500 hover:text-emerald-700 font-medium text-sm p-1 mr-2">Sửa</button>
                         <button onClick={() => handleDelete(c.id)} className="text-red-500 hover:text-red-700 font-medium text-sm p-1">Xóa</button>
                       </td>
                     </tr>

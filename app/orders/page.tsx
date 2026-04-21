@@ -63,17 +63,37 @@ export default function OrdersPage() {
     } finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchOrders(); }, []);
+  useEffect(() => {
+    let mounted = true;
+    const init = async () => {
+      try {
+        const qs = await getDocs(collection(db, "orders"));
+        const data = qs.docs.map(d => ({ id: d.id, ...d.data() } as Order)).sort((a,b) => b.createdAt - a.createdAt);
+        if (mounted) {
+          setOrders(data);
+          setLoading(false);
+        }
+      } catch (e) {
+        if (mounted) {
+          toast.error("Không tải được dữ liệu đơn hàng.");
+          setLoading(false);
+        }
+      }
+    };
+    init();
+    return () => { mounted = false; };
+  }, []);
 
   const handleSave = async () => {
     if (!formData.customerName || formData.total <= 0) return toast.error("Vui lòng điền đủ tên khách và tổng tiền");
     try {
+      const nowTs = new Date().getTime();
       if (editingId) {
-        await updateDoc(doc(db, "orders", editingId), { ...formData, total: Number(formData.total), updatedAt: Date.now() });
+        await updateDoc(doc(db, "orders", editingId), { ...formData, total: Number(formData.total), updatedAt: nowTs });
         toast.success("Cập nhật đơn hàng thành công!");
       } else {
         const orderNumber = "ORD-" + Math.floor(1000 + Math.random() * 9000);
-        await addDoc(collection(db, "orders"), { ...formData, orderNumber, total: Number(formData.total), createdAt: Date.now(), updatedAt: Date.now() });
+        await addDoc(collection(db, "orders"), { ...formData, orderNumber, total: Number(formData.total), createdAt: nowTs, updatedAt: nowTs });
         toast.success("Tạo đơn hàng thành công!");
       }
       setOpen(false); setFormData({ customerName: "", productsSummary: "", total: 0, status: "processing", paymentStatus: "unpaid" }); fetchOrders();
@@ -94,8 +114,8 @@ export default function OrdersPage() {
 
   const updateStatus = async (id: string, field: string, value: string) => {
     try {
-      const now = Date.now();
-      await updateDoc(doc(db, "orders", id), { [field]: value, updatedAt: now });
+      const nowTs = new Date().getTime();
+      await updateDoc(doc(db, "orders", id), { [field]: value, updatedAt: nowTs });
       fetchOrders();
       toast.success("Cập nhật thành công");
     } catch(e){ toast.error("Cập nhật lỗi"); }
@@ -179,7 +199,7 @@ export default function OrdersPage() {
                       </td>
                       <td className="px-6 py-4">
                         <Select value={o.paymentStatus} onValueChange={(v) => updateStatus(o.id, 'paymentStatus', v || "")}>
-                          <SelectTrigger className={cn("h-7 text-xs border-0", o.paymentStatus === 'paid' ? "bg-emerald-50 text-emerald-700" : o.paymentStatus === 'partial' ? "bg-blue-50 text-blue-700" : "bg-red-50 text-red-700")}><SelectValue>{paymentMap[o.paymentStatus] || o.paymentStatus}</SelectValue></SelectTrigger>
+                          <SelectTrigger className={cn("h-7 text-xs border-0", o.paymentStatus === 'paid' ? "bg-emerald-50 text-emerald-700" : o.paymentStatus === 'partial' ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700")}><SelectValue>{paymentMap[o.paymentStatus] || o.paymentStatus}</SelectValue></SelectTrigger>
                           <SelectContent>
                             <SelectItem value="unpaid">Chưa thanh toán</SelectItem>
                             <SelectItem value="partial">Đã cọc 1 phần</SelectItem>
@@ -188,7 +208,7 @@ export default function OrdersPage() {
                         </Select>
                       </td>
                       <td className="px-6 py-4 text-right min-w-[120px]">
-                        <button onClick={() => openEditModal(o)} className="text-blue-500 hover:text-blue-700 font-medium text-sm p-1 mr-2">Sửa</button>
+                        <button onClick={() => openEditModal(o)} className="text-emerald-500 hover:text-emerald-700 font-medium text-sm p-1 mr-2">Sửa</button>
                         <button onClick={() => handleDelete(o.id)} className="text-red-500 hover:text-red-700 font-medium text-sm">Xóa</button>
                       </td>
                     </tr>

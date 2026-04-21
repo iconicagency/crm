@@ -40,7 +40,7 @@ export function Sidebar() {
   return (
     <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0">
       <div className="p-6 flex items-center gap-3">
-        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">T</div>
+        <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center font-bold text-white">T</div>
         <span className="text-xl font-bold text-white tracking-tight">Tân Gia Huy</span>
       </div>
       

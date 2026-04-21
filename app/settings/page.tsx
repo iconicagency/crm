@@ -67,7 +67,7 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-6">
                     <Avatar className="h-20 w-20">
                       <AvatarImage src="" />
-                      <AvatarFallback className="bg-blue-600 text-white text-2xl font-bold">T</AvatarFallback>
+                      <AvatarFallback className="bg-emerald-600 text-white text-2xl font-bold">T</AvatarFallback>
                     </Avatar>
                     <div className="space-y-2 flex flex-col">
                        <Button variant="outline" size="sm" className="w-fit">Đổi Ảnh Đại Diện</Button>
@@ -186,7 +186,7 @@ export default function SettingsPage() {
                 <CardContent className="space-y-6">
                    <div className="border border-slate-200 rounded-lg p-5 flex flex-col lg:flex-row items-center justify-between gap-4 bg-white">
                      <div className="flex items-center gap-4">
-                       <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex shrink-0 items-center justify-center">
+                       <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex shrink-0 items-center justify-center">
                           <MessageSquare className="w-6 h-6" />
                        </div>
                        <div>
